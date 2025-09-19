@@ -100,3 +100,13 @@ region=$(aws configure get region)
 echo ""
 echo "Your website is live at:"
 echo "http://$bucket.s3-website-$region.amazonaws.com"
+
+# Schedule bucket deletion after 10 minutes
+(
+  echo "Waiting 10 minutes before deleting bucket $bucket..."
+  sleep 600
+  echo "Removing objects from bucket $bucket"
+  aws s3 rm s3://$bucket --recursive || echo "Warning: failed to remove objects"
+  echo "Deleting bucket $bucket"
+  aws s3 rb s3://$bucket || echo "Warning: failed to remove bucket"
+) & disown
